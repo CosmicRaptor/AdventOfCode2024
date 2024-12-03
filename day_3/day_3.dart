@@ -4,13 +4,25 @@ void main(){
   File f1 = File('day_3/input.txt');
   String text = f1.readAsStringSync();
   int countOne = 0;
+  bool isEnabled = true;
   for(int i =0; i <= text.length - 4; i++){
-    if(text.substring(i, i+4) == 'mul('){
+    if(text.substring(i, i+4) == 'do()') {
+      isEnabled = true;
+      // print('Found do at $i');
+      // i+=3;
+    }
+    else if(i+7 <= text.length && text.substring(i,i+7) == "don't()") {
+      isEnabled = false;
+      // print("Found don't at $i");
+      // i+= 6;
+    }
+    if(isEnabled && text.substring(i, i+4) == 'mul('){
       int? result = extractNMultiply(text, i+4);
       if(result != null){
         countOne += result;
       }
     }
+    // isEnabled = false;
   }
   print(countOne);
 
