@@ -1,27 +1,28 @@
 import 'dart:io';
 
-void main(){
+void main() {
   File f1 = File('day_5/input.txt');
   List<String> lines = f1.readAsLinesSync();
   List<List<int>> rules = [];
   List<List<int>> pagesToUpdate = [];
   bool isRules = true;
   int count1 = 0, count2 = 0;
-  for (String line in lines){
-    if (line == ''){
+  for (String line in lines) {
+    if (line == '') {
       isRules = false;
     }
-    if (isRules){
+    if (isRules) {
       rules.add(line.split('|').map(int.parse).toList());
     }
-    if (!isRules){
-      if (line != ''){
+    if (!isRules) {
+      if (line != '') {
         pagesToUpdate.add(line.split(',').map(int.parse).toList());
       }
     }
   }
-  for (List<int> item in pagesToUpdate){
+  for (List<int> item in pagesToUpdate) {
     count1 += getMiddle(item, rules);
+    count2 += getMiddleTwo(item, rules);
   }
   // print(rules);
   // print(pagesToUpdate);
@@ -29,13 +30,14 @@ void main(){
   print(count2);
 }
 
-int getMiddle(List<int> line, List<List<int>> rules){
+int getMiddle(List<int> line, List<List<int>> rules) {
   int count = 0;
   bool isValid = true;
-  print('The line is $line');
-  for(int i = 0; i < line.length; i++){
+  // print('The line is $line');
+  for (int i = 0; i < line.length; i++) {
     int number = line[i];
-    List<List<int>> relevantRules = rules.where((item) => item.contains(number)).toList();
+    List<List<int>> relevantRules =
+        rules.where((item) => item.contains(number)).toList();
     // print('The ruleset is $relevantRules');
     for (List<int> rule in relevantRules) {
       int indexX = line.indexOf(rule[0]);
@@ -46,8 +48,45 @@ int getMiddle(List<int> line, List<List<int>> rules){
       }
     }
   }
-  if(isValid){
-    count = line[(line.length /2).floor()];
+  if (isValid) {
+    count = line[(line.length / 2).floor()];
+    // print('Valid line $count');
+  }
+  return count;
+}
+
+int getMiddleTwo(List<int> line, List<List<int>> rules) {
+  int count = 0;
+  bool isValid = true;
+  print('The line is $line');
+  int i = 0;
+  while (i < line.length) {
+    int number = line[i];
+    bool swapOccurred = false;
+
+    List<List<int>> relevantRules =
+        rules.where((item) => item.contains(number)).toList();
+
+    for (List<int> rule in relevantRules) {
+      int indexX = line.indexOf(rule[0]);
+      int indexY = line.indexOf(rule[1]);
+
+      if (indexX >= 0 && indexY >= 0 && indexX >= indexY) {
+        isValid = false;
+        // Perform the swap
+        int temp = line[indexX];
+        line[indexX] = line[indexY];
+        line[indexY] = temp;
+
+        swapOccurred = true;
+        break;
+      }
+    }
+
+    if (!swapOccurred) i++;
+  }
+  if (!isValid && getMiddle(line, rules) != 0) {
+    count = line[(line.length / 2).floor()];
     print('Valid line $count');
   }
   return count;
